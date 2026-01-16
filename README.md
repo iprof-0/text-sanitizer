@@ -86,8 +86,8 @@ MIT License
 
 ---
 
-## 👤 [Author](iprof-0.github.io/Zero)
+## 👤 [Author](https://iprof-0.github.io/Zero)
 
-[Zero](iprof-0.github.io/Zero) 
+[Zero](https://iprof-0.github.io/Zero) 
 Cybersecurity Engineer  
 "No System is secure"
