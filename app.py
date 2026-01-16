@@ -8,7 +8,7 @@ from flask import Flask, request, render_template_string
 # Initialize Flask App
 app = Flask(__name__)
 
-# Modern Professional UI Template
+# Single File Template with Cyber Theme
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -16,177 +16,223 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>String Sanitizer Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* =========================================
+           VARIABLES & RESET (Cyber Theme)
+           ========================================= */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --danger: #ef4444;
-            --border: #334155;
+            --bg-dark: #0a0a0a;
+            --bg-card: #111111;
+            --bg-card-hover: #161616;
+            
+            --primary: #00ff88;       /* Neon Green */
+            --primary-dim: rgba(0, 255, 136, 0.1);
+            --secondary: #00ccff;     /* Cyan */
+            --accent: #ff0055;        /* Red */
+            
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            
+            --border-color: rgba(255, 255, 255, 0.08);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            
+            --transition: all 0.3s ease;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color);
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Allows scrolling */
             min-height: 100vh;
-            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 136, 0.03), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 204, 255, 0.03), transparent 25%);
         }
 
+        /* =========================================
+           LAYOUT & COMPONENTS
+           ========================================= */
         .container {
             width: 100%;
-            max-width: 600px;
-            background-color: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            margin-top: 5vh;
-            border: 1px solid var(--border);
+            max-width: 700px;
+            padding: 20px;
         }
 
+        /* Card Style */
+        .cyber-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: var(--transition);
+        }
+
+        .cyber-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 50px rgba(0, 255, 136, 0.05);
+        }
+
+        /* Typography */
         h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
+            font-family: var(--font-code);
+            color: #fff;
             text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            letter-spacing: -1px;
         }
 
         .subtitle {
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
+        .highlight { color: var(--primary); }
 
+        /* Forms */
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            margin-bottom: 25px;
         }
 
         label {
+            display: block;
+            margin-bottom: 8px;
+            font-family: var(--font-code);
             font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
+            color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 1px;
         }
 
         textarea, input[type="text"] {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border);
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-family: inherit;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: var(--font-main);
             font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
+            transition: var(--transition);
         }
 
         textarea:focus, input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background-color: rgba(0, 255, 136, 0.02);
+            box-shadow: 0 0 15px var(--primary-dim);
         }
 
-        button.submit-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-dim);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            font-family: var(--font-code);
+            font-weight: 700;
+            text-transform: uppercase;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s, transform 0.1s;
-            margin-top: 10px;
+            transition: var(--transition);
+            letter-spacing: 1px;
         }
 
-        button.submit-btn:hover {
-            background-color: var(--primary-hover);
+        .btn:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 20px var(--primary-dim);
         }
 
-        button.submit-btn:active {
-            transform: translateY(1px);
-        }
-
-        /* Result Section */
+        /* Results Area */
         .result-container {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-            animation: fadeIn 0.4s ease-out;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            animation: fadeIn 0.5s ease;
         }
 
         .result-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .result-box {
-            background-color: rgba(15, 23, 42, 0.5);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 0.95rem;
-            word-break: break-word;
+            background: #050505;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-code);
+            color: var(--text-main);
             white-space: pre-wrap;
+            word-break: break-word;
         }
 
         .copy-btn {
-            background-color: transparent;
-            border: 1px solid var(--border);
+            background: transparent;
+            border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 5px 15px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            transition: var(--transition);
         }
 
         .copy-btn:hover {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            border-color: var(--text-muted);
+            color: var(--primary);
+            border-color: var(--primary);
         }
 
-        .error-message {
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1.5rem;
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            color: var(--primary);
+        }
+
+        /* Error */
+        .error-msg {
+            color: var(--accent);
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
             font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         @keyframes fadeIn {
@@ -196,63 +242,62 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Text Sanitizer</h1>
-        <p class="subtitle">Securely remove specific words from your text.</p>
+        <div class="cyber-card">
+            <h1>TEXT <span class="highlight">SANITIZER</span></h1>
+            <p class="subtitle">Securely remove specific patterns from your text.</p>
 
-        <form method="POST">
-            <div class="form-group">
-                <label for="sentence">Source Text</label>
-                <textarea id="sentence" name="sentence" placeholder="Paste your text here..." required autofocus>{{ original_text if original_text else '' }}</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="word">Word to Remove</label>
-                <input type="text" id="word" name="word" placeholder="e.g. Secret" required value="{{ target_word if target_word else '' }}">
-            </div>
-            
-            <button type="submit" class="submit-btn">Process Text</button>
-        </form>
-
-        {% if error %}
-            <div class="error-message">
-                <strong>Error:</strong> {{ error }}
-            </div>
-        {% endif %}
-
-        {% if result %}
-            <div class="result-container">
-                <div class="result-header">
-                    <label>Cleaned Output</label>
-                    <button class="copy-btn" onclick="copyToClipboard()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        Copy Result
-                    </button>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="sentence">Source Text</label>
+                    <textarea id="sentence" name="sentence" placeholder="Paste your source text here..." required autofocus>{{ original_text if original_text else '' }}</textarea>
                 </div>
-                <div class="result-box" id="result-text">{{ result }}</div>
-            </div>
-        {% endif %}
+                
+                <div class="form-group">
+                    <label for="word">Target String</label>
+                    <input type="text" id="word" name="word" placeholder="e.g. SensitiveData" required value="{{ target_word if target_word else '' }}">
+                </div>
+                
+                <button type="submit" class="btn">Process Text</button>
+            </form>
+
+            {% if error %}
+                <div class="error-msg">
+                    <strong>Error:</strong> {{ error }}
+                </div>
+            {% endif %}
+
+            {% if result %}
+                <div class="result-container">
+                    <div class="result-header">
+                        <label>Cleaned Output</label>
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy Output</button>
+                    </div>
+                    <div class="result-box" id="result-text">{{ result }}</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            Designed & Built by <a href="https://iprof-0.github.io/Zero/#contact" target="_blank">Zero</a>
+        </div>
     </div>
 
     <script>
-        function copyToClipboard() {
+        function copyToClipboard(btn) {
             const text = document.getElementById('result-text').innerText;
             navigator.clipboard.writeText(text).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                const originalContent = btn.innerHTML;
-                
-                // Visual feedback
-                btn.style.borderColor = '#10b981';
-                btn.style.color = '#10b981';
-                btn.innerHTML = '<span>Copied!</span>';
+                const originalText = btn.innerText;
+                btn.innerText = "COPIED!";
+                btn.style.color = "var(--primary)";
+                btn.style.borderColor = "var(--primary)";
                 
                 setTimeout(() => {
-                    btn.innerHTML = originalContent;
-                    btn.style.borderColor = '';
-                    btn.style.color = '';
+                    btn.innerText = originalText;
+                    btn.style.color = "";
+                    btn.style.borderColor = "";
                 }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
             });
         }
     </script>
@@ -271,15 +316,12 @@ def home():
         original_text = request.form.get('sentence', '')
         target_word = request.form.get('word', '')
 
-        # 1. Validation: Empty inputs check
+        # Validation
         if not original_text or not target_word:
              error = "Input data is missing."
-        
         else:
-            # 2. Processing: Case insensitive removal
+            # Logic: Case insensitive removal
             try:
-                # re.escape handles special characters safely
-                # Using 3rd argument for flags inside compile or directly in sub
                 modified_sentence = re.sub(
                     re.escape(target_word), 
                     '', 
@@ -288,7 +330,7 @@ def home():
                 )
                 result = modified_sentence
             except Exception as e:
-                error = f"Processing Error: {str(e)}"
+                error = f"System Error: {str(e)}"
 
     return render_template_string(
         HTML_TEMPLATE, 
@@ -299,13 +341,13 @@ def home():
     )
 
 def open_browser():
-    """Opens the browser automatically after a short delay"""
+    """Opens browser automatically"""
     time.sleep(1.5)
     webbrowser.open_new("http://127.0.0.1:5000")
 
 if __name__ == "__main__":
-    # Start the browser in a separate thread
+    # Threading for browser
     threading.Thread(target=open_browser).start()
     
-    # Run the Flask server
+    # Run Flask
     app.run(port=5000, debug=False)
